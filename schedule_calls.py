@@ -2,9 +2,10 @@ import datetime
 import random
 import time
 import base64
+import pandas as pd
 from email.mime.text import MIMEText
 from calendar_setup import get_calendar_service
-from gmail_quickstart import get_service  # <- utilise ton gmail_quickstart
+from gmail_quickstart import get_service  
 
 # Connexion aux services
 calendar_service = get_calendar_service()
@@ -20,7 +21,7 @@ JOURS_DISPO = ["9:00-11:30", "11:30-14:30", "14:30-18:00", "18:00-20:00"]
 def create_client_meeting(client_name, client_email, start_datetime, collab_email):
     event = {
         'summary': f"Appel avec {client_name}",
-        'description': f"Appel téléphonique avec {client_name} ({client_email}). Durée : {DUREE_APPEL_MIN} minutes.\nTéléphone: {client_email}",
+        'description': f"Appel téléphonique avec {client_name} ({client_email}). Durée : {DUREE_APPEL_MIN} minutes.",
         'start': {'dateTime': start_datetime.isoformat(), 'timeZone': TIMEZONE},
         'end': {'dateTime': (start_datetime + datetime.timedelta(minutes=DUREE_APPEL_MIN)).isoformat(), 'timeZone': TIMEZONE},
         'attendees': [
@@ -48,40 +49,76 @@ def send_email(sender, to, subject, body_text):
     raw = base64.urlsafe_b64encode(msg.as_bytes()).decode()
     gmail_service.users().messages().send(userId="me", body={'raw': raw}).execute()
 
-# --- Exemple de collaborateurs et prospects ---
+# --- Exemple de collaborateurs ---
 collaborateurs = [
-    {"nom": "Celine", "email": "celine.pro@exemple.com"},
-    {"nom": "Ines", "email": "ines.pro@exemple.com"}
+    {"nom": "Dupont", "prenom":"Marie", "email": "u9373548876@gmail.com"},
+    {"nom": "Martin", "prenom":"Alex", "email": "alex.pro@example.com"} 
 ]
 
-prospects = [
-    {"prenom": f"Prenom{i}", "nom": f"Nom{i}", "email": f"prospect{i}@example.com"}
-    for i in range(10)  # 10 pour le test
-]
+# --- Lecture des clients depuis un fichier Excel ---
+# Assure-toi que le fichier a les colonnes : prenom, nom, email
+df_clients = pd.read_excel("prospects.xlsx")  
 
 # --- Simulation des rendez-vous ---
 today = datetime.datetime.now().replace(hour=9, minute=0, second=0, microsecond=0)
-for i, prospect in enumerate(prospects):
+for i, row in df_clients.iterrows():
     collab = random.choice(collaborateurs)
     start_time = today + datetime.timedelta(minutes=DUREE_APPEL_MIN*i)
-    client_name = f"{prospect['prenom']} {prospect['nom']}"
-    client_email = prospect['email']
+    client_name = f"{row['prenom']} {row['nom']}"
+    client_email = row['email']
 
     # Crée le rendez-vous Calendar
     create_client_meeting(client_name, client_email, start_time, collab['email'])
 
-    # Mail de notification aux deux
-    subject = f"Rendez-vous téléphonique avec {client_name}"
-    body = f"Bonjour {collab['nom']},\n\nVous avez un appel programmé avec {client_name} ({client_email}) le {start_time.strftime('%d/%m/%Y à %H:%M')}.\nDurée : {DUREE_APPEL_MIN} minutes."
-    send_email(collab['email'], collab['email'], subject, body)  # au collaborateur
-    send_email(collab['email'], client_email, subject, body)      # au client
+# --- Mail de notification pour le rendez-vous ---
 
-    # Mail de remerciement 1 min après l'appel
-    thank_you_subject = f"Merci pour votre appel, {prospect['prenom']}"
-    thank_you_body = f"Bonjour {prospect['prenom']},\n\nMerci pour votre échange avec {collab['nom']}.\nNous restons à votre disposition."
-    
-    # On simule le délai d'une minute après la fin de l'appel
-    time_to_wait = (DUREE_APPEL_MIN + DELAI_REMERCIMENT_MIN) * 60
-    time.sleep(0.1)  # <-- pour test on ne met pas toute la durée, juste un petit sleep
-    send_email(collab['email'], client_email, thank_you_subject, thank_you_body)
-    print(f"Mail de remerciement envoyé à {prospect['prenom']}")
+subject = f"Confirmation de votre rendez-vous téléphonique avec {client_name}"
+
+# Corps pour le collaborateur
+body_collab = f"""Bonjour {collab['prenom']} {collab['nom']},
+
+Vous avez un appel programmé avec {client_name} ({client_email}) le {start_time.strftime('%d/%m/%Y à %H:%M')}, d'une durée de {DUREE_APPEL_MIN} minutes.
+
+Merci de préparer cet échange afin d'assurer un suivi optimal.
+
+Cordialement,
+L’équipe FortalIA
+"""
+
+# Corps pour le client
+body_client = f"""Bonjour {row['prenom']} {row['nom']},
+
+Nous vous confirmons votre rendez-vous téléphonique avec {collab['prenom']} {collab['nom']} le {start_time.strftime('%d/%m/%Y à %H:%M')}, d'une durée de {DUREE_APPEL_MIN} minutes.
+
+Nous restons à votre disposition pour toute information complémentaire.
+
+Cordialement,
+L’équipe FortalIA
+"""
+
+# Envoi des mails de notification
+send_email(collab['email'], collab['email'], subject, body_collab)
+send_email(collab['email'], client_email, subject, body_client)
+
+# --- Mail de remerciement envoyé au client (1 min après l'appel) ---
+time.sleep(0.1)  # pour test, en prod: time.sleep((DUREE_APPEL_MIN + DELAI_REMERCIMENT_MIN) * 60)
+
+thank_you_subject = f"Merci pour votre appel, {row['prenom']}"
+thank_you_body = f"""Bonjour {row['prenom']} {row['nom']},
+
+Nous vous remercions pour l’échange téléphonique que vous avez eu avec {collab['prenom']} {collab['nom']}.  
+Nous restons à votre disposition pour toute question ou information supplémentaire concernant votre dossier.
+
+Cordialement,
+L’équipe FortalIA
+"""
+
+send_email(collab['email'], client_email, thank_you_subject, thank_you_body)
+
+# --- Notification interne au collaborateur que le mail de remerciement a été envoyé ---
+notif_subject = f"Mail de remerciement envoyé à {row['prenom']} {row['nom']}"
+notif_body = f"Le mail de remerciement a été envoyé avec succès à {row['prenom']} {row['nom']} ({client_email})."
+send_email(collab['email'], collab['email'], notif_subject, notif_body)
+
+print(f"Mail de remerciement envoyé à {row['prenom']} {row['nom']}")
+
