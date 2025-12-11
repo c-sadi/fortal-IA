@@ -12,34 +12,6 @@ from googleapiclient.discovery import build
 import sys
 import time
 
-# --- BLOC DE DÉPLOIEMENT SÉCURISÉ ---
-def setup_remote_files():
-    # Mapping: "Nom du fichier sur le disque" : "Nom de la clé dans secrets.toml"
-    json_files = {
-        "credentials.json": "credentials_json",
-        "token_calendar.json": "token_calendar_json",
-        "token_gmail.json": "token_gmail_json",  # <--- AJOUTÉ ICI
-        "token_drive.json": "token_drive_json",
-        "token.json": "token_json" # Si nécessaire pour agent2.py
-    }
-    
-    # Restauration des fichiers JSON
-    if "google_files" in st.secrets:
-        for filename, secret_key in json_files.items():
-            # On crée le fichier seulement s'il n'existe pas déjà
-            if not os.path.exists(filename) and secret_key in st.secrets["google_files"]:
-                with open(filename, "w") as f:
-                    f.write(st.secrets["google_files"][secret_key])
-
-    # Restauration du .env (pour Grok/OpenAI)
-    if not os.path.exists(".env") and "env_vars" in st.secrets:
-        with open(".env", "w") as f:
-            for key, value in st.secrets["env_vars"].items():
-                f.write(f"{key}={value}\n")
-
-# Exécution immédiate
-setup_remote_files()
-
 # -------------------
 # Config UI
 # -------------------
