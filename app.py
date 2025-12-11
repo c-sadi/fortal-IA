@@ -297,7 +297,7 @@ with right_col:
 
 st.write("---")
 if st.button("🔁 Recharger l'interface"):
-    st.experimental_rerun()
+    st.rerun()
 
 
 
