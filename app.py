@@ -267,7 +267,7 @@ with right_col:
         total = treated = not_treated = 0
     else:
         total = len(df_display)
-        treated = df_display['Traité'].fillna("").apply(lambda x: str(x).strip() == "✔️").sum()
+        treated = df_display['Traité'].fillna("").sum()
         not_treated = total - treated
 
     c1, c2, c3 = st.columns(3)
