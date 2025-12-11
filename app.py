@@ -10,6 +10,7 @@ from datetime import datetime
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 import sys
+import time
 
 # --- BLOC DE DÉPLOIEMENT SÉCURISÉ ---
 def setup_remote_files():
@@ -146,6 +147,8 @@ with left_col:
             ok, out = run_script(AGENT_SCRIPT)
             if ok:
                 st.success("✅ agent2.py exécuté")
+                time.sleep(1)
+                st.rerun()
             else:
                 st.error("⚠️ Erreur lors de l'exécution")
             st.code(out, language="bash")
