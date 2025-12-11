@@ -147,8 +147,6 @@ with left_col:
             ok, out = run_script(AGENT_SCRIPT)
             if ok:
                 st.success("✅ agent2.py exécuté")
-                time.sleep(5)
-                st.rerun()
             else:
                 st.error("⚠️ Erreur lors de l'exécution")
             st.code(out, language="bash")
