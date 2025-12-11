@@ -19,6 +19,7 @@ def setup_remote_files():
         "credentials.json": "credentials_json",
         "token_calendar.json": "token_calendar_json",
         "token.json": "token_json", # Le token utilisé par agent2.py
+        "token_gmail.json": "token_gmail_json",
         # "token_drive.json": "token_drive_json" # Décommentez si nécessaire
     }
     
