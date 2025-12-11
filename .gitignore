@@ -206,10 +206,13 @@ marimo/_static/
 marimo/_lsp/
 __marimo__/
 
-# Fichiers sensibles Google
-token.json
-credentials.json
-
 # Output Excel
 prospects.xlsx
 leads.xlsx
+
+#google
+credentials.json
+token_calendar.json 
+token_drive.json 
+token_gmail.json 
+token.json
