@@ -205,3 +205,14 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Output Excel
+prospects.xlsx
+leads.xlsx
+
+#google
+credentials.json
+token_calendar.json 
+token_drive.json 
+token_gmail.json 
+token.json
