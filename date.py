@@ -203,6 +203,18 @@ def main():
 
     print("Services Google Calendar + Gmail + Drive OK")
 
+    if not os.path.exists(EXCEL_FILE):
+        print(f"⚠️ Fichier {EXCEL_FILE} introuvable. Création d'un fichier vide.")
+        # On crée un DataFrame avec les colonnes attendues (ajustez selon vos besoins)
+        df_vide = pd.DataFrame(columns=[
+            "Date réception", "Prénom", "Nom", "Email", "Téléphone", 
+            "Sujet", "Résumé", "Jours disponibles", "Plages horaires", 
+            "Date RDV", "Heure RDV", "Traité"
+        ])
+        # On le sauvegarde pour créer le fichier physique
+        df_vide.to_excel(EXCEL_FILE, index=False)
+
+    # Maintenant on peut charger le fichier sans erreur
     wb = openpyxl.load_workbook(EXCEL_FILE)
     ws = wb.active
 
