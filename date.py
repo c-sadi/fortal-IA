@@ -5,6 +5,7 @@ from datetime import datetime, timedelta, time as dtime, timezone
 import base64
 import openpyxl
 from email.mime.text import MIMEText
+import pandas as pd
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
