@@ -208,9 +208,8 @@ def main():
         print(f"⚠️ Fichier {EXCEL_FILE} introuvable. Création d'un fichier vide.")
         # On crée un DataFrame avec les colonnes attendues (ajustez selon vos besoins)
         df_vide = pd.DataFrame(columns=[
-            "Date réception", "Prénom", "Nom", "Email", "Téléphone", 
-            "Sujet", "Résumé", "Jours disponibles", "Plages horaires", 
-            "Date RDV", "Heure RDV", "Traité"
+            "Prénom", "Nom", "Email", "Téléphone", "Adresse", "Ville", "Code postal", "Département", "Bien recherché", "Budget",
+            "Financement", "Délai", "Secteur", "Programme neuf", "Jour disponible", "Plage horaire", "Date d'entrée"
         ])
         # On le sauvegarde pour créer le fichier physique
         df_vide.to_excel(EXCEL_FILE, index=False)
