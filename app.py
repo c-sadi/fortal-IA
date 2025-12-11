@@ -9,7 +9,7 @@ import importlib
 from datetime import datetime
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
-
+import sys
 
 # --- BLOC DE DÉPLOIEMENT SÉCURISÉ ---
 def setup_remote_files():
@@ -95,7 +95,7 @@ def run_script(script_path):
     if not os.path.exists(script_path):
         return False, f"Script introuvable : {script_path}"
     try:
-        proc = subprocess.run(["python", script_path], capture_output=True, text=True, check=False)
+        proc = subprocess.run([sys.executable, script_path], capture_output=True, text=True, check=False)
         out = ""
         if proc.stdout:
             out += proc.stdout
